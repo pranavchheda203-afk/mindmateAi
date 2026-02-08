@@ -10,7 +10,7 @@ type PostDetailProps = {
 };
 
 export default function PostDetail({ post, onClose, onPostUpdated }: PostDetailProps) {
-  const { user, profile } = useAuth();
+  const { user} = useAuth();
   const [comments, setComments] = useState<PostComment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -28,13 +28,15 @@ export default function PostDetail({ post, onClose, onPostUpdated }: PostDetailP
       .from('post_comments')
       .select(`
         *,
-        profiles(id, full_name, role, avatar_url)
+        profiles(id, full_name, role)
       `)
       .eq('post_id', post.id)
       .order('created_at', { ascending: true });
 
+    console.log('Loaded comments:', data, error);  
     if (!error && data) {
       setComments(data);
+      console.log('Comments set:', comments);
     }
   };
 

@@ -6,7 +6,7 @@ import CreatePost from './CreatePost';
 import PostDetail from './PostDetail';
 
 export default function Community() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -14,17 +14,25 @@ export default function Community() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if(!user) return;
+    if (!showCreatePost) {
     loadPosts();
-  }, [categoryFilter]);
+  }
+  }, [user,categoryFilter]);
 
   const loadPosts = async () => {
     setLoading(true);
+
     let query = supabase
       .from('community_posts')
       .select(`
-        *,
-        profiles(id, full_name, role, avatar_url)
-      `)
+      *,
+      profiles:profiles!community_posts_user_id_fkey(
+        id,
+        full_name,
+        role
+      )
+    `)
       .order('created_at', { ascending: false });
 
     if (categoryFilter !== 'all') {
@@ -33,9 +41,13 @@ export default function Community() {
 
     const { data, error } = await query;
 
-    if (!error && data) {
-      setPosts(data);
+    if (error) {
+      console.error('LOAD POSTS ERROR:', error);
+      setPosts([]);
+    } else {
+      setPosts(data ?? []);
     }
+
     setLoading(false);
   };
 
@@ -150,11 +162,10 @@ export default function Community() {
             <button
               key={category}
               onClick={() => setCategoryFilter(category)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                categoryFilter === category
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`px-4 py-2 rounded-lg transition-colors ${categoryFilter === category
+                ? 'bg-teal-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
             >
               {category === 'all' ? 'All' : category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
             </button>

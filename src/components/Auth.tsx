@@ -76,9 +76,9 @@ export default function Auth() {
                   onChange={(e) => setRole(e.target.value as 'patient' | 'doctor' | 'ngo')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 >
-                  <option value="patient">Patient / Individual</option>
-                  <option value="doctor">Mental Health Professional</option>
-                  <option value="ngo">NGO / Organization</option>
+                  <option value="patient">Patient</option>
+                  <option value="doctor">Doctor</option>
+                  <option value="ngo">NGO</option>
                 </select>
               </div>
             </>
